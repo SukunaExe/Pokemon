@@ -5,26 +5,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pokemon</title>
-  <link href="../css/projet.css" rel="stylesheet">
-  <link rel="icon" type="image/x-icon" href="../webp/logo/favicon.ico">
+  <link href="css/projet.css" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="webp/logo/favicon.ico">
 </head>
 
-<script src="../data/charged_moves.js"></script>
-<script src="../data/class_pokemon.js"></script>
-<script src="../data/class_type.js"></script>
-<script src="../data/class_attack.js"></script>
-<script src="../data/cp_multiplier.js"></script>
-<script src="../data/fast_moves.js"></script>
-<script src="../data/generation.js"></script>
-<script src="../data/pokemon_moves.js"></script>
-<script src="../data/pokemon_type.js"></script>
-<script src="../data/pokemon.js"></script>
-<script src="../data/type_effectiveness.js"></script>
+<script src="data/charged_moves.js"></script>
+<script src="data/class_pokemon.js"></script>
+<script src="data/class_type.js"></script>
+<script src="data/class_attack.js"></script>
+<script src="data/cp_multiplier.js"></script>
+<script src="data/fast_moves.js"></script>
+<script src="data/generation.js"></script>
+<script src="data/pokemon_moves.js"></script>
+<script src="data/pokemon_type.js"></script>
+<script src="data/pokemon.js"></script>
+<script src="data/type_effectiveness.js"></script>
 <script src="script_v5.js"></script>
 
 <body>
   <div class="title">
-    <img src="../webp/logo/title.png" alt="police-pokemon">
+    <img src="webp/logo/title.png" alt="police-pokemon">
   </div>
 
 
@@ -86,7 +86,7 @@
     <div id="modal-overlay" class="modal-overlay"></div>
     <!-- appliquer la fermeture au click en dehors de la modal sur cet élément qui doit prendre le style css de modal -->
     <div class="modal-inner">
-      <div id="modalClose" class="modal-close"><img src="../webp/logo/close.svg"></div>
+      <div id="modalClose" class="modal-close"><img src="webp/logo/close.svg"></div>
       <div class="modal-left">
         <h2 id="modalPokemonName" class="modal-pokemon-name"></h2>
         <div id="modalPokemonImage" class="modal-pokemon-image"></div>
@@ -118,7 +118,7 @@
       // Convertir l'ID du Pokémon en une chaîne de trois chiffres avec des zéros de remplissage
       const paddedId = String(pokemonId).padStart(3, '0');
       // Le chemin de l'image est construit en fonction du format spécifié
-      return `../webp/thumbnails/${paddedId}.webp`;
+      return `webp/thumbnails/${paddedId}.webp`;
     }
     // Fonction pour récupérer le chemin de l'image sprites en fonction de l'ID du Pokémon
     function getImageSprites(pokemonId) {
@@ -126,10 +126,10 @@
       const paddedId = String(pokemonId).padStart(3, '0');
       if (paddedId > 809) {
         // Le chemin de l'image pour certains pokemon ne contient pas de MS (à faire attention)
-        return `../webp/sprites/${paddedId}.webp`;
+        return `webp/sprites/${paddedId}.webp`;
       } else {
         // Le chemin de l'image est construit en fonction du format spécifié
-        return `../webp/sprites/${paddedId}MS.webp`;
+        return `webp/sprites/${paddedId}MS.webp`;
       }
     }
     // Fonction pour récupérer le chemin de l'image normale en fonction de l'ID du Pokémon
@@ -137,13 +137,13 @@
       // Convertir l'ID du Pokémon en une chaîne de trois chiffres avec des zéros de remplissage
       const paddedId = String(pokemonId).padStart(3, '0');
       // Le chemin de l'image est construit en fonction du format spécifié
-      return `../webp/images/${paddedId}.webp`;
+      return `webp/images/${paddedId}.webp`;
     }
 
     // Fonction pour obtenir le chemin d'accès à l'image en fonction du type
     function getTypeImagePath(typeName) {
       // Chemin d'accès commun aux images des types
-      const typesImagePath = "../webp/types/";
+      const typesImagePath = "webp/types/";
 
       switch (typeName) {
         case 'Steel':
@@ -496,7 +496,7 @@
               default:
             }
 
-            const logoImagePath = "../webp/logo/";
+            const logoImagePath = "webp/logo/";
 
             // Utilisation des propriétés correctes du Pokémon pour remplir les cellules
             if (property === 'types') {
