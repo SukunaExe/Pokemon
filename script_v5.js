@@ -370,7 +370,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     default:
                 }
 
-                const logoImagePath = "../webp/logo/";
+                const logoImagePath = "webp/logo/";
 
                 // Utilisation des propriétés correctes du Pokémon pour remplir les cellules
                 if (property === 'types') {
@@ -596,7 +596,7 @@ document.addEventListener("DOMContentLoaded", function () {
         staminaData.textContent = pokemon.base_stamina
         // Ajouter l'image de l'endurance
         const imgStamina = document.createElement('img');
-        imgStamina.src = '../webp/logo/endurance.svg';
+        imgStamina.src = 'webp/logo/endurance.svg';
         imgStamina.classList.add('stats-icon');
         staminaData.appendChild(imgStamina);
 
@@ -618,7 +618,7 @@ document.addEventListener("DOMContentLoaded", function () {
         attackData.textContent = pokemon.base_attack
         // Ajouter l'image de l'endurance
         const imgAttack = document.createElement('img');
-        imgAttack.src = '../webp/logo/attack.svg';
+        imgAttack.src = 'webp/logo/attack.svg';
         imgAttack.classList.add('stats-icon');
         attackData.appendChild(imgAttack);
 
@@ -639,7 +639,7 @@ document.addEventListener("DOMContentLoaded", function () {
         defenseData.textContent = pokemon.base_defense
         // Ajouter l'image de l'endurance
         const imgDefense = document.createElement('img');
-        imgDefense.src = '../webp/logo/defense.svg';
+        imgDefense.src = 'webp/logo/defense.svg';
         imgDefense.classList.add('stats-icon');
         defenseData.appendChild(imgDefense);
 
