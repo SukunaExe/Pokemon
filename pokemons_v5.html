@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokemon</title>
+  <link href="../css/projet.css" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="../webp/logo/favicon.ico">
+</head>
+
+<script src="../data/charged_moves.js"></script>
+<script src="../data/class_pokemon.js"></script>
+<script src="../data/class_type.js"></script>
+<script src="../data/class_attack.js"></script>
+<script src="../data/cp_multiplier.js"></script>
+<script src="../data/fast_moves.js"></script>
+<script src="../data/generation.js"></script>
+<script src="../data/pokemon_moves.js"></script>
+<script src="../data/pokemon_type.js"></script>
+<script src="../data/pokemon.js"></script>
+<script src="../data/type_effectiveness.js"></script>
+<script src="script_v5.js"></script>
+
+<body>
+  <div class="title">
+    <img src="../webp/logo/title.png" alt="police-pokemon">
+  </div>
+
+
+
+  <div class="page-width">
+    <form action="#">
+      <div id="filter-container">
+        <div id="filter-name-container">
+          <input type="text" id="filter-name" name="filter-name" placeholder="Entrez un nom"><br>
+        </div>
+        <div id="filter-type-container">
+          <select id="filter-type" name="choix">
+            <option value="*">Choisissez un type</option>
+          </select>
+        </div>
+        <div id="filter-generation-container">
+          <select id="filter-generation" name="choix">
+            <option value="*">Choisissez une génération</option>
+          </select>
+        </div>
+      </div>
+    </form>
+    <div id="sortButtonLittleScreen">
+      <h5 sort="">Nom</h5>
+      <h5 sort="">Type</h5>
+      <h5 sort="">ID</h5>
+      <h5 sort="">Generation</h5>
+      <h5 sort="">Endurance</h5>
+      <h5 sort="">Attaque</h5>
+      <h5 sort="">Defense</h5>
+    </div>
+    <table id="tablePokemon">
+      <thead>
+        <tr>
+          <th>Image</th>
+          <th sort="">Nom</th>
+          <th sort="">Type</th>
+          <th sort="">ID</th>
+          <th sort="">Generation</th>
+          <th sort="">Endurance</th>
+          <th sort="">Attaque</th>
+          <th sort="">Defense</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Les boutons de navigation et les éléments pour afficher le numéro de page actuelle et le nombre total de pages -->
+  <div class="pagination">
+    <button id="prevButton">PRÉC</button>
+    <span id="pageInfo"></span>
+    <button id="nextButton">SUIV</button>
+  </div>
+
+  <!-- Zone de détails pour afficher les informations d'un Pokémon -->
+  <div id="modal" class="modal">
+    <div id="modal-overlay" class="modal-overlay"></div>
+    <!-- appliquer la fermeture au click en dehors de la modal sur cet élément qui doit prendre le style css de modal -->
+    <div class="modal-inner">
+      <div id="modalClose" class="modal-close"><img src="../webp/logo/close.svg"></div>
+      <div class="modal-left">
+        <h2 id="modalPokemonName" class="modal-pokemon-name"></h2>
+        <div id="modalPokemonImage" class="modal-pokemon-image"></div>
+        <div id="modalPokemonID" class="modal-pokemon-id"></div>
+        <div id="modalPokemonTypes" class="modal-pokemon-types"></div>
+        <div id="modalPokemonStats" class="modal-pokemon-stats"></div>
+      </div>
+      <div class="modal-center">
+        <div id="modalChargedAttackDetails" class="modal-attack-details">
+          <h3>Attaques Chargées</h3>
+          <select id="chargedAttacks" class="modal-attack_list"></select>
+          <div class="modal-charged-attack-stats"></div>
+        </div>
+      </div>
+      <div class="modal-right">
+        <div id="modalFastAttackDetails" class="modal-attack-details">
+          <h3>Attaques Rapides</h3>
+          <select id="fastAttacks" class="modal-attack_list"></select>
+          <div class="modal-fast-attack-stats"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    // Fonction pour récupérer le chemin de l'image thumbnails en fonction de l'ID du Pokémon
+    function getImageThumbnails(pokemonId) {
+      // Convertir l'ID du Pokémon en une chaîne de trois chiffres avec des zéros de remplissage
+      const paddedId = String(pokemonId).padStart(3, '0');
+      // Le chemin de l'image est construit en fonction du format spécifié
+      return `../webp/thumbnails/${paddedId}.webp`;
+    }
+    // Fonction pour récupérer le chemin de l'image sprites en fonction de l'ID du Pokémon
+    function getImageSprites(pokemonId) {
+      // Convertir l'ID du Pokémon en une chaîne de trois chiffres avec des zéros de remplissage
+      const paddedId = String(pokemonId).padStart(3, '0');
+      if (paddedId > 809) {
+        // Le chemin de l'image pour certains pokemon ne contient pas de MS (à faire attention)
+        return `../webp/sprites/${paddedId}.webp`;
+      } else {
+        // Le chemin de l'image est construit en fonction du format spécifié
+        return `../webp/sprites/${paddedId}MS.webp`;
+      }
+    }
+    // Fonction pour récupérer le chemin de l'image normale en fonction de l'ID du Pokémon
+    function getImageNormal(pokemonId) {
+      // Convertir l'ID du Pokémon en une chaîne de trois chiffres avec des zéros de remplissage
+      const paddedId = String(pokemonId).padStart(3, '0');
+      // Le chemin de l'image est construit en fonction du format spécifié
+      return `../webp/images/${paddedId}.webp`;
+    }
+
+    // Fonction pour obtenir le chemin d'accès à l'image en fonction du type
+    function getTypeImagePath(typeName) {
+      // Chemin d'accès commun aux images des types
+      const typesImagePath = "../webp/types/";
+
+      switch (typeName) {
+        case 'Steel':
+          return typesImagePath + 'acier.png';
+        case 'Fighting':
+          return typesImagePath + 'combat.png';
+        case 'Dragon':
+          return typesImagePath + 'dragon.png';
+        case 'Water':
+          return typesImagePath + 'eau.png';
+        case 'Electric':
+          return typesImagePath + 'electrik.png';
+        case 'Fairy':
+          return typesImagePath + 'fee.png';
+        case 'Fire':
+          return typesImagePath + 'feu.png';
+        case 'Ice':
+          return typesImagePath + 'glace.png';
+        case 'Bug':
+          return typesImagePath + 'insecte.png';
+        case 'Normal':
+          return typesImagePath + 'normal.png';
+        case 'Grass':
+          return typesImagePath + 'plante.png';
+        case 'Poison':
+          return typesImagePath + 'poison.png';
+        case 'Psychic':
+          return typesImagePath + 'psy.png';
+        case 'Rock':
+          return typesImagePath + 'roche.png';
+        case 'Ground':
+          return typesImagePath + 'sol.png';
+        case 'Ghost':
+          return typesImagePath + 'spectre.png';
+        case 'Dark':
+          return typesImagePath + 'tenebres.png';
+        case 'Flying':
+          return typesImagePath + 'vol.png';
+        default:
+          // Si le type n'est pas reconnu, retourne une chaîne vide
+          return '';
+      }
+    }
+
+    // Fonction pour générer la balise <img> en fonction du type
+    function getTypeImageTag(typeName) {
+      const imagePath = getTypeImagePath(typeName);
+      if (imagePath !== '') {
+        return '<img src="' + imagePath + '" alt="' + typeName + '">';
+      } else {
+        // Si le type n'est pas reconnu, retourne simplement le nom du type
+        return typeName;
+      }
+    }
+
+    function getColorType(type) {
+      // Définissez les couleurs primaires pour chaque type
+      switch (type) {
+        case 'Steel':
+          return '#5a8ea2';
+        case 'Fighting':
+          return '#ce416b';
+        case 'Dragon':
+          return '#0b6dc3';
+        case 'Water':
+          return '#5090d6';
+        case 'Electric':
+          return '#f4d23c';
+        case 'Fairy':
+          return '#ec8fe6';
+        case 'Fire':
+          return '#ff9d55';
+        case 'Ice':
+          return '#73cec0';
+        case 'Bug':
+          return '#91c12f';
+        case 'Normal':
+          return '#919aa2';
+        case 'Grass':
+          return '#63ba5a';
+        case 'Poison':
+          return '#aa6bc8';
+        case 'Psychic':
+          return '#fa7179';
+        case 'Rock':
+          return '#c5b78c';
+        case 'Ground':
+          return '#d97845';
+        case 'Ghost':
+          return '#5269ad';
+        case 'Dark':
+          return '#5a5465';
+        case 'Flying':
+          return '#8fa9de';
+        default:
+          // Si le type n'est pas reconnu, retourne une chaîne vide
+          return '#CCCCCC';
+      }
+    }
+
+    // Fonction pour formater l'identifiant
+    function formatId(id) {
+      // Si l'identifiant est inférieur à 10, ajoutez des zéros devant
+      if (id < 10) {
+        return '#00' + id;
+      }
+      // Si l'identifiant est inférieur à 100, ajoutez un zéro devant
+      else if (id < 100) {
+        return '#0' + id;
+      }
+      // Sinon, retournez l'identifiant tel quel
+      else {
+        return '#' + id;
+      }
+    }
+
+    // Fonction pour formater la génération
+    function formatPokemonGeneration(generation) {
+      return 'GEN ' + generation;
+    }
+
+    // Fonction pour obtenir la valeur maximale de la statistique de base d'endurance parmi tous les Pokémon
+    function getMAX_STAMINA() {
+      let maxStamina = 0;
+      for (let pokemon of Object.values(Pokemon.all_pokemons)) {
+        if (pokemon.base_stamina > maxStamina) {
+          maxStamina = pokemon.base_stamina;
+        }
+      }
+      return maxStamina;
+    }
+
+    // Fonction pour obtenir la valeur maximale de la statistique de base d'attaque parmi tous les Pokémon
+    function getMAX_ATTACK() {
+      let maxAttack = 0;
+      for (let pokemon of Object.values(Pokemon.all_pokemons)) {
+        if (pokemon.base_attack > maxAttack) {
+          maxAttack = pokemon.base_attack;
+        }
+      }
+      return maxAttack;
+    }
+
+    // Fonction pour obtenir la valeur maximale de la statistique de base de défense parmi tous les Pokémon
+    function getMAX_DEFENSE() {
+      let maxDefense = 0;
+      for (let pokemon of Object.values(Pokemon.all_pokemons)) {
+        if (pokemon.base_defense > maxDefense) {
+          maxDefense = pokemon.base_defense;
+        }
+      }
+      return maxDefense;
+    }
+
+    // Fonction pour identifier la bonne couleur à utiliser en fonction du pourcentage des stats du pokemon par rapport aux stats max
+    function getStatsColor(pourcentage) {
+      if (pourcentage < 20) {
+        return '#f0331e';
+      } else if (pourcentage >= 20 && pourcentage < 35) {
+        return '#f78628';
+      } else if (pourcentage >= 35 && pourcentage < 55) {
+        return '#dda917';
+      } else if (pourcentage >= 55 && pourcentage < 75) {
+        return '#8dc640';
+      } else {
+        return '#4db748';
+      }
+    }
+
+
+    function import_moves(actual_pokemon_id, pokeform) {
+      recup_attack = [];
+      //on crée nos objet Attack à partir des JSON
+      for (let data_pokemon_moves of pokemon_moves) {
+        if (data_pokemon_moves.pokemon_id == actual_pokemon_id) {
+          if (data_pokemon_moves.form == pokeform) {
+            for (let data_charged_move_name of data_pokemon_moves.charged_moves) {
+              for (let charged_move of charged_moves) {
+                if (charged_move.name == data_charged_move_name) {
+                  if (Attack.all_attacks[charged_move.move_id] === undefined) {
+                    new Charged_moves(
+                      charged_move.move_id,
+                      charged_move.name,
+                      charged_move.type,
+                      charged_move.duration,
+                      charged_move.energy_delta,
+                      charged_move.power,
+                      charged_move.stamina_loss_scaler,
+                      charged_move.critical_chance
+                    );
+                  }
+                  recup_attack.push(Attack.all_attacks[charged_move.move_id]);
+                }
+              }
+
+            }
+            for (let data_fast_move_name of data_pokemon_moves.fast_moves) {
+              for (let fast_move of fast_moves) {
+                if (fast_move.name == data_fast_move_name) {
+                  if (Attack.all_attacks[fast_move.move_id] === undefined) {
+                    new Fast_moves(
+                      fast_move.move_id,
+                      fast_move.name,
+                      fast_move.type,
+                      fast_move.duration,
+                      fast_move.energy_delta,
+                      fast_move.power,
+                      fast_move.stamina_loss_scaler,
+                    );
+                  }
+                  recup_attack.push(Attack.all_attacks[fast_move.move_id]);
+                }
+              }
+
+            }
+          }
+
+        }
+      }
+      return recup_attack;
+    }
+
+    function import_generation(actual_pokemon_name) {
+      for (let data_generation in generation) {
+        for (let data_generation_pokemon of generation[data_generation]) {
+          if (data_generation_pokemon.name === actual_pokemon_name) {
+            return data_generation_pokemon.generation_number;
+          }
+        }
+      }
+      return null
+    }
+
+    function import_type(actual_pokemon_id, pokeform) {
+      // on crée nos objet Type à partir du JSON
+      for (let dataType of pokemon_type) {
+        if (dataType.form == pokeform) {
+          if (dataType.pokemon_id == actual_pokemon_id) {
+            for (let po_type of dataType.type) {
+              if (Type.all_type[po_type] === undefined) {
+                newtype = new Type(
+                  po_type,
+                  type_effectiveness[po_type]
+                );
+              }
+            }
+            return dataType.type
+          }
+        }
+      }
+    }
+
+    // Fonction pour importer les données depuis le fichier pokemon.js
+    function import_pokemon() {
+      // Parcours de chaque Pokémon dans les données
+      for (let data of pokemon) {
+
+
+        if (data.form === 'Normal') {
+
+          if (Pokemon.all_pokemons[data.pokemon_id] === undefined) {
+            //on retrouve l'objet Type correspondant au pokemon actuel
+            let actual_pokemon_type = [];
+            let recup_poke_type = import_type(data.pokemon_id, data.form);
+
+            for (let dataType of recup_poke_type) {
+              actual_pokemon_type.push(Type.all_type[dataType]);
+            }
+
+            let actual_pokemon_attacks = import_moves(data.pokemon_id, data.form);
+            let actual_pokemon_generation = import_generation(data.pokemon_name);
+
+            //On crée notre objet pokemon à partir du tableau
+            const pokemon = new Pokemon(
+              data.pokemon_id,
+              data.pokemon_name,
+              data.form,
+              data.base_attack,
+              data.base_defense,
+              data.base_stamina,
+              actual_pokemon_generation,
+              actual_pokemon_type,
+              actual_pokemon_attacks
+            );
+
+            // Ajoutez le chemin de l'image thumbnails du Pokémon
+            pokemon.ImageThumbnails = getImageThumbnails(data.pokemon_id);
+            // Pareil pour le spirtes
+            pokemon.ImageSprites = getImageSprites(data.pokemon_id);
+            // Pareil pour l'image normale'
+            pokemon.ImageNormal = getImageNormal(data.pokemon_id);
+          }
+        }
+      }
+    }
+
+    // Appelez la fonction pour importer les Pokémon
+    import_pokemon();
+
+    // Récupération de l'élément tbody
+    let tableBody = document.getElementById('tableBody');
+
+    // Parcours des données et ajout des lignes au tableau
+    for (const pokemonId in Pokemon.all_pokemons) {
+      if (Pokemon.all_pokemons.hasOwnProperty(pokemonId)) {
+        const pokemon = Pokemon.all_pokemons[pokemonId];
+        if (pokemon.generation !== null) {
+          const newRow = document.createElement('tr');
+          newRow.setAttribute('data-pokemon-id', pokemon.pokemon_id);
+
+          // Ajout de la cellule pour l'image du Pokémon
+          const imageCell = document.createElement('td');
+          imageCell.setAttribute('data-label', 'Image');
+          const imageContainer = document.createElement('div'); // Création du div container
+          imageContainer.classList.add('image-container'); // Ajout de la classe image-container
+          const pokemonImage = document.createElement('img');
+          pokemonImage.src = pokemon.ImageSprites; // Utilisation du chemin de l'image du Pokémon
+          pokemonImage.alt = pokemon.pokemon_name; // Ajout d'un texte alternatif pour l'image
+          imageContainer.appendChild(pokemonImage); // Ajout de l'image dans le div container
+          imageCell.appendChild(imageContainer); // Ajout du div container dans la cellule de l'image
+          newRow.appendChild(imageCell); // Ajout de la cellule dans la nouvelle ligne
+
+          // Ajout des cellules pour chaque propriété du Pokémon
+          const properties = ['pokemon_name', 'types', 'pokemon_id', 'generation', 'base_stamina', 'base_attack', 'base_defense'];
+          properties.forEach(property => {
+            const cell = document.createElement('td');
+
+            switch (property) {
+              case 'pokemon_name':
+                cell.setAttribute('data-label', 'Nom');
+                break;
+              case 'types':
+                cell.setAttribute('data-label', 'Type');
+                break;
+              case 'pokemon_id':
+                cell.setAttribute('data-label', 'ID');
+                break;
+              case 'generation':
+                cell.setAttribute('data-label', 'Generation');
+                break;
+              case 'base_stamina':
+                cell.setAttribute('data-label', 'Endurance');
+                break;
+              case 'base_attack':
+                cell.setAttribute('data-label', 'Attaque');
+                break;
+              case 'base_defense':
+                cell.setAttribute('data-label', 'Defense');
+                break;
+              default:
+            }
+
+            const logoImagePath = "../webp/logo/";
+
+            // Utilisation des propriétés correctes du Pokémon pour remplir les cellules
+            if (property === 'types') {
+              let imgTags = '';
+
+              for (let type of pokemon.types) {
+                imgTags += getTypeImageTag(type._type_name);
+              }
+
+              // Créez une balise <div> et ajoutez le contenu des balises <img>
+              const divElement = document.createElement('div');
+              // Ajoutez des classes à la balise <div>
+              divElement.classList.add('types-container');
+              divElement.innerHTML = imgTags;
+
+              // Ajoutez la balise <div> avec les balises <img> à l'intérieur à la cellule <td>
+              cell.appendChild(divElement);
+            } else if (property === 'pokemon_id') {
+              // Formater l'identifiant du Pokémon
+              const formattedId = formatId(pokemon.pokemon_id);
+              // Ajouter le texte formatté à la cellule
+              cell.textContent = formattedId;
+
+            } else if (property === 'generation') {
+              // Formater l'identifiant du Pokémon
+              const formattedGeneration = formatPokemonGeneration(pokemon.generation);
+              // Ajouter le texte formatté à la cellule
+              cell.textContent = formattedGeneration;
+
+            } else if (property === 'base_stamina' || property === 'base_attack' || property === 'base_defense') {
+              // Créez une balise <div> et ajoutez-y le contenu des balises <img>
+              const divElement = document.createElement('div');
+              // Ajoutez des classes à la balise <div>
+              divElement.classList.add('stats-container');
+
+              // Créez un élément pour le texte pokemon[property]
+              const textElement = document.createElement('span');
+              textElement.textContent = pokemon[property];
+
+              // Créez un élément pour l'image
+              const imgElement = document.createElement('img');
+              switch (property) {
+                case 'base_stamina':
+                  imgElement.src = logoImagePath + 'endurance.svg';
+                  break;
+                case 'base_attack':
+                  imgElement.src = logoImagePath + 'attack.svg';
+                  break;
+                case 'base_defense':
+                  imgElement.src = logoImagePath + 'defense.svg';
+                  break;
+              }
+
+              // Ajoutez une classe à l'image pour le style
+              imgElement.classList.add('stats-icon');
+
+              // Ajoutez le texte et l'image à la balise <div>
+              divElement.appendChild(textElement);
+              divElement.appendChild(imgElement);
+
+              // Ajoutez la balise <div> avec les balises <img> à l'intérieur à la cellule <td>
+              cell.appendChild(divElement);
+            } else {
+              // Pour toutes les autres propriétés
+              cell.textContent = pokemon[property];
+            }
+
+            newRow.appendChild(cell);
+          });
+
+          tableBody.appendChild(newRow);
+        }
+      }
+    }
+
+
+
+
+
+
+    // filtre génération
+
+    let allGenerations = []
+    // on créer un liste de toutes les générations
+    for (let pokemon in Pokemon.all_pokemons) {
+      if (!allGenerations.includes(Pokemon.all_pokemons[pokemon].generation) && Pokemon.all_pokemons[pokemon].generation !== null) {
+        allGenerations.push(Pokemon.all_pokemons[pokemon].generation);
+      }
+    }
+    //console.log(allGenerations)
+
+
+
+    // Sélection de la liste déroulante
+    var select = document.getElementById("filter-generation");
+
+    // Boucle à travers chaque generation et les ajoute à la liste déroulante
+    allGenerations.forEach(function (option) {
+      var opt = document.createElement("option");
+      opt.textContent = "Génération " + option;
+      opt.value = option;
+      select.appendChild(opt);
+    });
+
+
+
+    // filtre Type
+    // Sélection de la liste déroulante
+    var select = document.getElementById("filter-type");
+
+    // Boucle à travers chaque generation et les ajoute à la liste déroulante
+    filterTypes = Object.values(Type.all_type)
+    //console.log(filterTypes);
+    filterTypes.forEach(function (option) {
+      var opt = document.createElement("option");
+      switch (option.type_name) {
+        case 'Steel':
+          var filterTypeName = 'Acier';
+          break;
+        case 'Fighting':
+          var filterTypeName = 'Combat';
+          break;
+        case 'Dragon':
+          var filterTypeName = 'Dragon';
+          break;
+        case 'Water':
+          var filterTypeName = 'Eau';
+          break;
+        case 'Electric':
+          var filterTypeName = 'Electrique';
+          break;
+        case 'Fairy':
+          var filterTypeName = 'Fée';
+          break;
+        case 'Fire':
+          var filterTypeName = 'Feu';
+          break;
+        case 'Ice':
+          var filterTypeName = 'Glace';
+          break;
+        case 'Bug':
+          var filterTypeName = 'Insecte';
+          break;
+        case 'Normal':
+          var filterTypeName = 'Normal';
+          break;
+        case 'Grass':
+          var filterTypeName = 'Plante';
+          break;
+        case 'Poison':
+          var filterTypeName = 'Poison';
+          break;
+        case 'Psychic':
+          var filterTypeName = 'Psy';
+          break;
+        case 'Rock':
+          var filterTypeName = 'Roche';
+          break;
+        case 'Ground':
+          var filterTypeName = 'Sol';
+          break;
+        case 'Ghost':
+          var filterTypeName = 'Spectre';
+          break;
+        case 'Dark':
+          var filterTypeName = 'Ténèbres';
+          break;
+        case 'Flying':
+          var filterTypeName = 'Vol';
+          break;
+        default:
+          var filterTypeName = option.type_name;
+          break;
+      }
+      opt.textContent = "Type " + filterTypeName;
+      opt.value = option.type_name;
+      select.appendChild(opt);
+    });
+
+
+  </script>
+</body>
+
+</html>

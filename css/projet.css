@@ -1,0 +1,571 @@
+* {
+    font-family: 'pokedex';
+}
+
+body {
+    background-color: #525174;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+@font-face {
+    font-family: pokedex;
+    src: url(../font/pokedex.ttf);
+}
+
+
+.title {
+    display: flex;
+    justify-content: center;
+    padding: 1em;
+}
+
+.title img {
+    width: 100%;
+    max-width: 500px;
+}
+
+table {
+    width: 100%;
+    border-spacing: 0;
+    border-collapse: separate;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+th {
+    background-color: #1e3161;
+    font-weight: bold;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+tr {
+    background-color: #3a4d7c;
+    color: #f1effe;
+    text-align: center;
+}
+
+td {
+    border-bottom: 1px solid #ddd;
+}
+
+tr:hover td {
+    background-color: #5676c0;
+}
+
+
+.page-width {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 0 1.2rem;
+}
+
+.image-container {
+    position: relative;
+    display: inline-block;
+}
+
+.image-container img {
+    width: 3em;
+    background: transparent;
+    margin: 0.5em 0;
+}
+
+.modal-image-container {
+    display: none;
+    position: fixed;
+    top: 50%;
+    /* Centrage vertical */
+    left: 50%;
+    /* Centrage horizontal */
+    transform: translate(-50%, -50%);
+    /* Décalage de moitié de la taille du conteneur */
+    background-color: #3a4d7c;
+    border: 5px solid;
+    border-radius: 20px;
+    width: 400px;
+    height: 400px;
+    z-index: 999;
+    /* Pour s'assurer que le div est au-dessus de l'image */
+}
+
+.modal-image-container img {
+    width: 390px;
+    height: 390px;
+}
+
+@media screen and (min-width: 1200px) {
+    .image-container:hover .modal-image-container {
+        display: block;
+    }
+}
+
+.types-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    background-color: transparent;
+}
+
+.types-container img {
+    width: 6rem;
+    border-radius: 5px;
+}
+
+.stats-container {
+    display: flex;
+    /* Utiliser Flexbox pour aligner les éléments */
+    align-items: center;
+    /* Aligner les éléments verticalement */
+    justify-content: center;
+    background-color: transparent;
+    gap: 5px;
+}
+
+.stats-icon {
+    width: 20px;
+    /* Taille fixe pour l'image */
+    height: 20px;
+    /* Taille fixe pour l'image */
+}
+
+.pagination {
+    background-color: #f8f9fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1em;
+    border-radius: 10px;
+    max-width: 500px;
+    margin: 0 auto;
+    gap: 10px;
+}
+
+.pagination button {
+    background-color: #1e3161;
+    /* Boutons foncés */
+    color: #fff;
+    border: none;
+    padding: 0.5em 1em;
+    margin: 0 0.3em;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.pagination button:hover {
+    background-color: #5676c0;
+}
+
+.modal {
+    display: none;
+    /* Cache la fenêtre modale par défaut */
+    background-color: rgb(0 0 0 / 70%);
+    color: #f1effe;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.modal-inner {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    position: fixed;
+    background-color: #1e3161;
+    width: 800px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 1em 3em 1em 1em;
+    border-radius: 20px;
+    box-shadow: 0px 0px 15px 5px rgba(0, 0, 0, 0.5);
+}
+
+
+.modal-pokemon-name,
+.modal-attack-details h3 {
+    font-family: 'Arial';
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 0.5em;
+}
+
+.modal-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.modal-pokemon-id {
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+}
+
+.modal-pokemon-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #3a4d7c;
+    border: 3px solid;
+    border-radius: 20px;
+    width: 200px;
+    height: 200px;
+}
+
+.modal-pokemon-image img {
+    width: 5em;
+    height: 5em;
+}
+
+.modal-types-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-bottom: 0.5em;
+    gap: 10px;
+    background-color: transparent;
+}
+
+.modal-types-container img {
+    width: 6rem;
+    border-radius: 5px;
+}
+
+.modal-stats-element-container {
+    padding-bottom: 0.5em;
+}
+
+.stat-full-gauge {
+    position: relative;
+    width: 200px;
+    height: 20px;
+    overflow: hidden;
+    padding: 2px;
+    border-radius: 20px;
+    border: 2px solid;
+    box-shadow: inset -3px -3px 2px rgba(0, 0, 0, .2);
+}
+
+.stat-data-gauge {
+    font-family: 'Arial';
+    font-size: 1em;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    gap: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.stat-data-gauge .stats-icon {
+    width: 17px;
+    height: 17px;
+}
+
+.stat-gauge {
+    float: left;
+    height: 20px;
+    border-radius: 20px;
+    box-shadow: inset -3px -3px 2px rgba(0, 0, 0, .3);
+}
+
+.modal-attack_list {
+    font-family: 'Arial';
+    font-size: 1em;
+    width: 100%;
+    line-height: 2em;
+    height: 2em;
+    /* Hauteur maximale de la liste */
+    overflow-y: auto;
+    /* Activer la barre de défilement si le contenu dépasse la hauteur maximale */
+    margin: 0;
+    padding: 0;
+}
+
+.modal-attack_list option {
+    font-family: 'Arial';
+    font-size: 1em;
+}
+
+.modal-charged-attack-stats,
+.modal-fast-attack-stats {
+    padding: 1em 0;
+}
+
+.attack-property {
+    font-family: 'Arial';
+    font-size: 1em;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.attack-types-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    column-gap: 10px;
+    padding: 0;
+    background-color: transparent;
+}
+
+.attack-types-container img {
+    width: 5rem;
+    border-radius: 5px;
+}
+
+/* Pour afficher les libellés au début */
+.attack-property[data-label]::before {
+    content: attr(data-label);
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-right: 1em;
+    /* Pour espacer les libellés des données */
+}
+
+
+.modal-close {
+    position: absolute;
+    top: 0.5em;
+    right: 0.5em;
+    cursor: pointer;
+    font-size: 20px;
+    background-color: #f1effe;
+    border-radius: 20px;
+    width: 30px;
+    height: 30px;
+}
+
+.modal-close img {
+    width: 100%;
+    height: 100%;
+}
+
+
+
+
+
+/* -------------------------------------------Filter style----------------------------------- */
+
+#filter-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+#filter-name-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+#filter-name {
+    font-size: 1em;
+    border-radius: 10px;
+    height: 2em;
+}
+
+#filter-type,
+#filter-generation {
+
+    font-size: 1em;
+    width: 100%;
+    line-height: 2em;
+    height: 2em;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0;
+    border-radius: 10px;
+}
+
+#filter-type-container,
+#filter-generation-container {
+    margin-left: 20px;
+}
+
+
+
+
+#sortButtonLittleScreen{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    color: white;
+    display: none;
+}
+
+
+
+
+
+/* Pour le tableau responsive : https://codepen.io/AllThingsSmitty/pen/MyqmdM?editors=1100 */
+@media screen and (max-width: 1200px) {
+    .title img {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    table {
+        border: 0;
+    }
+
+    table caption {
+        font-size: 1.3em;
+    }
+
+    table thead {
+        border: none;
+        clip: rect(0 0 0 0);
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 1px;
+    }
+
+    table tr {
+        display: block;
+        margin-bottom: 1.2rem;
+        border-spacing: 0;
+        border-collapse: separate;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        overflow: hidden;
+    }
+
+    table td {
+        border-bottom: 1px solid #ddd;
+        display: block;
+        font-size: .8em;
+        text-align: right;
+        padding: 0.5em 0;
+    }
+
+    /* Pour chaque cellule de la table ayant l'attribut data-label */
+    table td[data-label] {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5em;
+    }
+
+    /* Pour afficher les libellés au début */
+    table td[data-label]::before {
+        content: attr(data-label);
+        font-weight: bold;
+        text-transform: uppercase;
+        margin-right: 1em;
+        /* Pour espacer les libellés des données */
+    }
+
+    table td[data-label="Image"] {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0.5em;
+    }
+
+    table td[data-label="Image"] img {
+        width: 5em;
+    }
+
+    table td[data-label="Image"]::before {
+        content: none;
+        /* Masquer le contenu */
+    }
+
+    table td:last-child {
+        border-bottom: 0;
+    }
+
+    .types-container {
+        flex-direction: row;
+    }
+
+    .modal-inner {
+        flex-wrap: wrap;
+        width: 250px;
+        justify-content: center;
+        padding: 1em;
+        gap: 0;
+    }
+
+    .modal-pokemon-image {
+        width: 100px;
+        height: 100px;
+    }
+
+    .modal-pokemon-name,
+    .modal-attack-details h3 {
+        margin: 0 0 0.5em 0;
+    }
+
+    .modal-center,
+    .modal-right {
+        width: 230px;
+    }
+
+    .modal-charged-attack-stats,
+    .modal-fast-attack-stats {
+        padding: 0.5em 0 0 0;
+    }
+
+    .modal-attack_list {
+        font-size: 0.8em;
+        line-height: 2em;
+        height: 1.5em;
+    }
+
+    .attack-property {
+        font-size: 0.8em;
+    }
+
+    #filter-type-container,
+    #filter-generation-container {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+
+    #sortButtonLittleScreen{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: white;
+        display:"";
+    }
+
+    #sortButtonLittleScreen >h5{
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+
+
+}
